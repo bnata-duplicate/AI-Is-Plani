@@ -1,107 +1,89 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime
+from datetime import date
 
-# --- 🛰️ SİSTEM AYARLARI VE DASHBOARD TASARIMI ---
+# --- 🛰️ SİSTEM AYARLARI ---
 st.set_page_config(page_title="AI Atlas Strategic OS", layout="wide")
 
-# CSS ile Görsel İyileştirme
-st.markdown("""
-    <style>
-    .main { background-color: #f5f7f9; }
-    .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    </style>
-    """, unsafe_allow_html=True)
-
 st.title("🧬 AI Atlas: Kurumsal Stratejik İşletim Sistemi")
-st.caption("Kişi → Departman → Kurum Konsolide Raporlama ve Karar Destek Paneli")
+st.caption("Operasyonel Veri Giriş Merkezi (PDF Kaynaklı Veri Setleri)")
 
-# --- 📊 ÜST PANEL: KONSOLİDE KURUMSAL ÖZET ---
+# --- 📊 ÜST PANEL (Dinamik Özet) ---
 c1, c2, c3, c4 = st.columns(4)
-with c1: st.metric("Kurum Sağlık Skoru", "%84", "↑ %2")
-with c2: st.metric("İK Departman Uyumu", "%91", "Kritik", delta_color="inverse")
-with c3: st.metric("AI Güven Endeksi", "78/100", "Stabil")
-with c4: st.metric("Dönüşüm Soruları", "12 Adet", "Aksiyon Bekliyor")
+c1.metric("Toplam Aktif Görev", "12 Adet", "Sezon Açılış")
+c2.metric("Bekleyen Onay", "4 Adet", "Kritik")
+c3.metric("AI Güven Skoru", "88/100", "Stabil")
+c4.metric("Dönüşüm Bekleyen KPI", "3 Adet", "Aksiyon Gerekli")
 
 st.divider()
 
 # --- 🛠️ ANA PROGRAM AKIŞI (SEKMELER) ---
 tabs = st.tabs([
-    "👤 KİŞİ: Veri Girişi", 
-    "🏢 DEPT: Onay & Ara Değerlendirme", 
-    "📈 KURUM: Konsolide Dashboard", 
-    "⚖️ AI ATLAS: Karar Odası"
+    "👤 KİŞİ: VERİ GİRİŞ EKRANLARI", 
+    "🏢 DEPT: ONAY & ARA DEĞERLENDİRME", 
+    "📈 KURUM: KONSOLİDE DASHBOARD", 
+    "⚖️ AI ATLAS: KARAR ODASI"
 ])
 
-# --- 1. KİŞİSEL VERİ GİRİŞİ (Atlas_Operasyon_01/02) ---
+# --- 1. KİŞİ: VERİ GİRİŞ EKRANLARI (PDF'DEKİ TÜM BAŞLIKLAR) ---
 with tabs[0]:
-    st.subheader("Bireysel Görev ve Operasyonel İlerleme")
-    col_a, col_b = st.columns([2, 1])
-    
-    with col_a:
-        st.write("**Sorumlu:** Atlas_Operasyon_01 (Ezgi K.)")
-        st.info("📌 Görev: Lise Stajyer Görüşmeleri (149 Gün)")
-        ilerleme = st.slider("Mevcut İlerleme Yüzdesi (%)", 0, 100, 40)
-        kpi_beyan = st.number_input("Bağlı KPI Başarı Beyanı (%)", 0, 100, 90)
-    
-    with col_b:
-        st.write("### Notlar / Engelleyiciler")
-        st.text_area("Yöneticiye Not:", "Süreç planlandığı gibi gidiyor ancak aday kalitesi düşük.")
-        if st.button("Veriyi Onaya Gönder"):
-            st.success("Veri Departman Onayına iletildi.")
+    st.subheader("📋 Günlük ve Dönemsel Faaliyet Girişi")
+    st.info("Lütfen sorumlu olduğunuz faaliyet alanına ait verileri giriniz.")
 
-# --- 2. DEPARTMAN ONAY VE ARA DEĞERLENDİRME ---
+    # PDF VERİ GİRİŞ NOKTASI 1: SEZON AÇILIŞ VE FAALİYETLER
+    with st.expander("🚀 SEZON AÇILIŞ VE REVİZYON İŞLEMLERİ", expanded=True):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.write("**Operasyonel Durum**")
+            sezon_durum = st.selectbox("Sezon Hazırlık Durumu", ["Hazırlık", "Revizyon", "Tamamlandı", "Ertelendi"], key="s1")
+            ilerleme_s = st.slider("Genel Hazırlık İlerlemesi (%)", 0, 100, 40, key="s2")
+        with col2:
+            st.write("**Dokümantasyon**")
+            talimat_sayisi = st.number_input("Güncellenen Talimat/Prosedür Sayısı", 0, 50, 0)
+            onay_durum = st.checkbox("Yönetim Onayı Alındı mı?")
+        with col3:
+            st.write("**Zamanlama**")
+            st.date_input("Tahmini Bitiş Tarihi", value=date(2023, 6, 30))
+            st.button("Sezon Verilerini Kaydet")
+
+    # PDF VERİ GİRİŞ NOKTASI 2: STAJYER VE İŞE ALIM SÜREÇLERİ
+    with st.expander("🎓 STAJYER SEÇİM VE MÜLAKAT YÖNETİMİ"):
+        col4, col5, col6 = st.columns(3)
+        with col4:
+            st.write("**Mülakat Havuzu**")
+            aday_sayisi = st.number_input("Görüşülen Toplam Aday Sayısı", 0, 500, 0)
+            mulakat_puani = st.slider("Aday Kalite Ortalaması (1-10)", 1, 10, 5)
+        with col5:
+            st.write("**Yerleştirme**")
+            secilen_stajyer = st.number_input("Seçilen/Onaylanan Stajyer", 0, 100, 0)
+            stajyer_kpi = st.progress(secilen_stajyer/100 if secilen_stajyer <= 100 else 1.0)
+        with col6:
+            st.write("**AI Analiz Notu**")
+            st.text_area("Mülakat Engelleyicileri:", "Örn: Teknik yetkinlik yetersizliği...", height=100)
+            st.button("Stajyer Verilerini Gönder")
+
+    # PDF VERİ GİRİŞ NOKTASI 3: TERFİ VE EĞİTİM YÖNETİMİ
+    with st.expander("📈 TERFİ KURULU VE EĞİTİM VERİMLİLİĞİ"):
+        col7, col8 = st.columns(2)
+        with col7:
+            st.write("**Terfi Kurulu**")
+            aday_personel = st.number_input("Kurula Giren Personel Sayısı", 0, 50, 0)
+            terfi_onay = st.number_input("Onaylanan Terfi Sayısı", 0, 50, 0)
+        with col8:
+            st.write("**Eğitim**")
+            egitim_saat = st.number_input("Toplam Verilen Eğitim (Saat)", 0, 1000, 0)
+            basari_skoru = st.slider("Eğitim Başarı Puanı (%)", 0, 100, 75)
+        st.button("Eğitim/Terfi Verilerini Mühürle")
+
+# --- DİĞER SEKMELER (Geliştirilmeye Hazır Boş Yapı) ---
 with tabs[1]:
-    st.subheader("Departman Süzgeci ve AI Denetimi")
-    st.write("**Onay Bekleyen Birim:** İK Departmanı")
-    
-    # AI AJANI BURADA DEVREYE GİRER
-    st.warning(f"⚠️ **DİKKAT:** Atlas_Operasyon_01 ilerlemeyi %{ilerleme} beyan ederken, KPI başarısını %{kpi_beyan} olarak girdi.")
-    
-    c_onay1, c_onay2 = st.columns(2)
-    with c_onay1:
-        st.error(f"AI Atlas Analizi: İlerleme (%{ilerleme}) ile KPI Beyanı (%{kpi_beyan}) arasında TUTARSIZLIK tespit edildi.")
-        st.metric("Veri Güven Skoru", "35/100")
-    
-    with c_onay2:
-        st.write("### Yönetici Aksiyonu")
-        st.button("Veriyi Revizyon İçin Geri Gönder")
-        st.button("Tutarsızlığa Rağmen Onayla (Riskli)")
+    st.subheader("🏢 Departman Onay Süzgeci")
+    st.write("Kişi sekmesinden girilen veriler burada AI tarafından denetlenir.")
 
-# --- 3. KURUMSAL KONSOLİDE DASHBOARD ---
 with tabs[2]:
-    st.subheader("Kurum Geneli Performans Konsolidasyonu")
-    
-    # Konsolide Veri Tablosu
-    kons_data = pd.DataFrame({
-        "Departman": ["İK", "Operasyon", "Satış", "Finans"],
-        "İş Planı %": [85, 62, 91, 88],
-        "KPI Skoru %": [70, 58, 94, 90],
-        "Kapasite Kullanımı %": [95, 80, 75, 60]
-    })
-    
-    col_chart1, col_chart2 = st.columns(2)
-    with col_chart1:
-        st.write("**Departman Bazlı Performans Karşılaştırması**")
-        st.bar_chart(kons_data.set_index("Departman")[["İş Planı %", "KPI Skoru %"]])
-    
-    with col_chart2:
-        st.write("**Stratejik Risk Haritası**")
-        st.line_chart(kons_data.set_index("Departman")["Kapasite Kullanımı %"])
-    
-    st.table(kons_data)
+    st.subheader("📈 Kurumsal Konsolide Dashboard")
+    st.write("Tüm operasyonel verilerin stratejik özeti.")
 
-# --- 4. AI ATLAS: KARAR ODASI VE DÖNÜŞÜM ---
 with tabs[3]:
-    st.subheader("Stratejik Karar Destek Odası")
-    st.markdown("### ❓ Neyi farklı yapmalıyız?")
-    
-    st.write("**Kritik Çıktı:** İK Departmanı Eğitim Verimliliği KPI'ı 3 aydır düşük seyrediyor.")
-    
-    with st.expander("AI Atlas Önerilerini Gör"):
-        st.write("1. Mentorluk sistemini 'Liderlik' etiketiyle iş planına ekleyin.")
-        st.write("2. Atlas_Operasyon_02'nin üzerindeki iş yükünü (Stajyer görüşmeleri) %20 azaltın.")
-    
-    karar = st.text_area("Alınan Stratejik Karar:", placeholder="Buraya alınan kararı yazın...")
-    if st.button("Kararı Mühürle ve İş Planına Görev Olarak Ata"):
-        st.success("Karar mühürlendi. Bu karar artık yeni bir operasyonel görevdir.")
+    st.subheader("⚖️ AI ATLAS: Karar Odası")
+    st.write("Neyi farklı yapmalıyız? sorusunun sorulduğu yer.")
